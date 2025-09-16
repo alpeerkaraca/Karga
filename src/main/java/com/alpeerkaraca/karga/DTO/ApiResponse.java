@@ -1,5 +1,12 @@
-package com.alpeerkaraca.karga.Models.DTO;
+package com.alpeerkaraca.karga.DTO;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Map;
+
+@Setter
+@Getter
 public class ApiResponse <T>{
     private boolean success;
     private String message;
@@ -21,29 +28,15 @@ public class ApiResponse <T>{
     }
 
 
-
-    public boolean isSuccess() {
-        return success;
+    public static <T> ApiResponse<T> errorWithDetails(String s, Map<String, String> errors) {
+        ApiResponse<T> response = new ApiResponse<>();
+        response.setSuccess(false);
+        response.setData(null);
+        String message = "";
+        errors.forEach((k,v)->{
+                message.concat(v + ", ");
+        });
+        response.setMessage(message);
+        return response;
     }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
 }

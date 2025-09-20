@@ -32,10 +32,11 @@ public class ApiResponse <T>{
         ApiResponse<T> response = new ApiResponse<>();
         response.setSuccess(false);
         response.setData(null);
-        String message = "";
+        StringBuilder messageBuilder = new StringBuilder();
         errors.forEach((k,v)->{
-                message.concat(v + ", ");
+                messageBuilder.append(v).append(", ");
         });
+        String message = messageBuilder.toString();
         response.setMessage(message);
         return response;
     }

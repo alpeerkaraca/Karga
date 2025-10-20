@@ -1,13 +1,17 @@
 package com.alpeerkaraca.karga.Controllers;
 
 import com.alpeerkaraca.karga.DTO.ApiResponse;
+import com.alpeerkaraca.karga.DTO.UserProfileResponse;
+import com.alpeerkaraca.karga.DTO.UserProfileUpdateRequest;
 import com.alpeerkaraca.karga.Models.Users;
 import com.alpeerkaraca.karga.Services.AuthService;
 import com.alpeerkaraca.karga.Services.UserService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 public class UsersController {
@@ -20,13 +24,31 @@ public class UsersController {
     }
 
 
-    @GetMapping("/get/{email}")
-    public ResponseEntity<ApiResponse<Users>> getUser(@PathVariable String email) {
+    @GetMapping("/me")
+    public ApiResponse<UserProfileResponse> getUser() {
         try {
-            var user = userService.getUserByEmail(email);
-            return ResponseEntity.ok(ApiResponse.success(user, "Kullanıcı verileri başarıyla alındı."));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(e.getMessage()));
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            UserProfileResponse userProfileResponse = userService.getUserInformation(email);
+            return ApiResponse.success(userProfileResponse, "Bilgiler alındı");
+        } catch (Exception e) {
+            throw  new RuntimeException(e);
         }
+    }
+
+    @PutMapping("/me")
+    public ApiResponse<UserProfileResponse> updateUser(@Valid @RequestBody UserProfileUpdateRequest request) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            Users users = userService.getUserByEmail(email);
+            users.setPhoneNumber(request.phoneNumber());
+            users.setFirstName(request.firstName());
+            users.setLastName(request.lastName());
+            UserProfileResponse userInfo = userService.updateUser(users);
+            return ApiResponse.success(userInfo,"Kullanıcı Güncellendi.");
+        }
+        catch (Exception e) {
+            throw   new RuntimeException(e);
+        }
+
     }
 }

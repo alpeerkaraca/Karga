@@ -5,7 +5,6 @@ import com.alpeerkaraca.karga.Repositories.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,16 +20,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users user = usersRepository.findByEmail(username).orElseThrow(()  -> new UsernameNotFoundException(username));
-        return new User(
-                user.getEmail(),
-                user.getPassword(),
-                getAuthority(user)
+        Users users = usersRepository.findByEmail(username).orElseThrow(()  -> new UsernameNotFoundException(username));
+        return new org.springframework.security.core.userdetails.User(
+                users.getEmail(),
+                users.getPassword(),
+                getAuthority(users)
         );
     }
 
-    private Collection<? extends GrantedAuthority> getAuthority(Users user) {
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
+    private Collection<? extends GrantedAuthority> getAuthority(Users users) {
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_" + users.getRole().name());
         return List.of(grantedAuthority);
     }
 }

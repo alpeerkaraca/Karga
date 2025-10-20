@@ -1,21 +1,25 @@
 package com.alpeerkaraca.karga.Models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.databind.ser.Serializers;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.UUID;
 @Setter
 @Getter
 @Entity
-public class Vehicle {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Vehicle extends BaseClass {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID vehicleId;
+
     private String brand;
     private String model;
     @Column(unique = true, nullable = false)

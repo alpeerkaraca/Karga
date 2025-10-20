@@ -2,6 +2,10 @@ package com.alpeerkaraca.karga.Models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.SQLUpdate;
+import org.hibernate.annotations.Where;
 
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -11,7 +15,11 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Users {
+@Table(name = "users")
+@SQLDelete(sql = "UPDATE users SET deleted_at = NOW() WHERE id = ?")
+@SQLUpdate(sql = "UPDATE users SET updated_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
+public class Users extends BaseClass{
     @Id
     @GeneratedValue
     private UUID userId;
@@ -25,6 +33,8 @@ public class Users {
     private double rating;
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    private Timestamp createdAt;
 
+    @OneToOne(mappedBy = "users", fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Driver driver;
 }

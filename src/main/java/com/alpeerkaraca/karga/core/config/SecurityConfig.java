@@ -53,7 +53,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(req -> req
                     .requestMatchers("/api/auth/**", "/actuator/**").permitAll()
                     .requestMatchers("/api/v1/drivers/**").hasAnyRole("DRIVER", "ADMIN")
-                    .requestMatchers("/api/v1/trips/**").hasAnyRole("PASSENGER", "ADMIN")
+                    .requestMatchers("/api/v1/trips/nearby-drivers", "/api/v1/trips/request").hasAnyRole("PASSENGER", "ADMIN")
+                    .requestMatchers("/api/v1/trips/{tripId}/accept","/api/v1/trips/{tripId}/complete", "/api/v1/trips/{tripId}/start").hasAnyRole("DRIVER","ADMIN")
+                    .requestMatchers("/api/v1/trips/{tripId}/cancel").hasAnyRole("DRIVER","PASSENGER","ADMIN")
                     .anyRequest().authenticated()
             ).authenticationProvider(authenticationProvider())
             .sessionManagement(session ->

@@ -25,10 +25,13 @@ public class TripNearbyDrivers {
     private final TripRequestService tripRequestService;
 
     @GetMapping("/nearby-drivers")
-    public ApiResponse<List<NearbyDriversResponse>> getNearbyDrivers(@Valid @RequestBody NearbyDriversRequest request) {
+    public ApiResponse<List<NearbyDriversResponse>> getNearbyDrivers(
+            @jakarta.validation.constraints.NotNull @org.springframework.web.bind.annotation.RequestParam("latitude") Double latitude,
+            @jakarta.validation.constraints.NotNull @org.springframework.web.bind.annotation.RequestParam("longitude") Double longitude
+    ) {
         List<NearbyDriversResponse> nearbyDrivers = tripRequestService.findNearbyDrivers(
-                request.latitude(),
-                request.longitude(),
+                latitude,
+                longitude,
                 DEFAULT_RADIUS_KM
         );
         return ApiResponse.success(

@@ -9,6 +9,6 @@ import java.util.UUID;
 
 public interface UsersRepository extends JpaRepository<Users, UUID> {
     Optional<Users> findByEmail(String email);
-    @Query("SELECT u FROM Users u WHERE u.userId = :id AND u.deletedAt IS NOT NULL ")
+    @Query("SELECT u FROM Users u WHERE u.userId = :id AND u.deletedAt IS NULL ")
     Optional<Users> findDeletedById(@Param("id") UUID id);
 }

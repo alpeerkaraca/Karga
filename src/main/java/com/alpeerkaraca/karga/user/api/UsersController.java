@@ -26,29 +26,19 @@ public class UsersController {
 
     @GetMapping("/me")
     public ApiResponse<UserProfileResponse> getUser() {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            UserProfileResponse userProfileResponse = userService.getUserInformation(email);
-            return ApiResponse.success(userProfileResponse, "Bilgiler alındı");
-        } catch (Exception e) {
-            throw  new RuntimeException(e);
-        }
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserProfileResponse userInfo = userService.getUserInformation(email);
+        return ApiResponse.success(userInfo,"Kullanıcı Bilgileri Getirildi.");
     }
 
     @PutMapping("/me")
     public ApiResponse<UserProfileResponse> updateUser(@Valid @RequestBody UserProfileUpdateRequest request) {
-        try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Users users = userService.getUserByEmail(email);
-            users.setPhoneNumber(request.phoneNumber());
-            users.setFirstName(request.firstName());
-            users.setLastName(request.lastName());
-            UserProfileResponse userInfo = userService.updateUser(users);
-            return ApiResponse.success(userInfo,"Kullanıcı Güncellendi.");
-        }
-        catch (Exception e) {
-            throw   new RuntimeException(e);
-        }
-
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Users user = userService.getUserByEmail(email);
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        user.setPhoneNumber(request.phoneNumber());
+        UserProfileResponse updatedUser = userService.updateUser(user);
+        return ApiResponse.success(updatedUser, "Kullanıcı Bilgileri Güncellendi.");
     }
 }

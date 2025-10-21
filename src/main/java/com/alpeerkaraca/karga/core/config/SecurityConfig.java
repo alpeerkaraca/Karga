@@ -53,6 +53,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(req -> req
                     .requestMatchers("/api/auth/**", "/actuator/**").permitAll()
                     .requestMatchers("/api/v1/drivers/**").hasAnyRole("DRIVER", "ADMIN")
+                    .requestMatchers("/api/v1/trips/**").hasAnyRole("PASSENGER", "ADMIN")
                     .anyRequest().authenticated()
             ).authenticationProvider(authenticationProvider())
             .sessionManagement(session ->

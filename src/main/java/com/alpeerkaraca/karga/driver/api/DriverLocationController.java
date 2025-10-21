@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/drivers")
-@PreAuthorize("hasRole('DRIVER') or hasRole('ADMIN')")
 public class DriverLocationController {
 
     private final DriverLocationService driverLocationService;

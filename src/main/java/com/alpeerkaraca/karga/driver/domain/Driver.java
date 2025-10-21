@@ -29,5 +29,6 @@ public class Driver extends BaseClass {
     private Vehicle vehicle;
 
     private boolean isApproved;
+
     private boolean isActive;
 }

@@ -60,6 +60,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Sunucuda beklenmedik bir hata oluştu. Lütfen daha sonra tekrar deneyin."));
+//                .body(ApiResponse.error(ex.getMessage()));
     }
 
 }

@@ -1,11 +1,12 @@
 package com.alpeerkaraca.karga.driver.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 
 public record LocationUpdateRequest(
-        @NotBlank
+        @Min(-90) @Max(90)
         double latitude,
-        @NotBlank
+        @Min(-180) @Max(180)
         double longitude
 ) {
 }

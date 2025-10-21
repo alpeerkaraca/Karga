@@ -33,7 +33,7 @@ public class LocationConsumerService {
                     driverIdStr
             );
         } else {
-            log.warn("Çevrımdışı sürücü için güncelleme alındı:{}", driverIdStr);
+            log.warn("Çevrimdışı sürücü için güncelleme alındı:{}", driverIdStr);
         }
     }
 }

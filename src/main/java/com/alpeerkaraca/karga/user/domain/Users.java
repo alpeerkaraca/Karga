@@ -16,8 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-@SQLDelete(sql = "UPDATE users SET deleted_at = NOW() WHERE id = ?")
-@SQLUpdate(sql = "UPDATE users SET updated_at = NOW() WHERE id = ?")
+@SQLDelete(sql = "UPDATE users SET deleted_at = NOW() WHERE user_id = ?")
+@SQLUpdate(sql = "UPDATE users SET updated_at = NOW() WHERE user_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Users extends BaseClass {
     @Id

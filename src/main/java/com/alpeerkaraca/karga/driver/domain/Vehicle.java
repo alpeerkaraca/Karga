@@ -16,7 +16,7 @@ import java.util.UUID;
 public class Vehicle extends BaseClass {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID vehicleId;
 
     private String brand;

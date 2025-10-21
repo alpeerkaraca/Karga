@@ -3,6 +3,7 @@ package com.alpeerkaraca.karga.user.application;
 import com.alpeerkaraca.karga.user.domain.Users;
 import com.alpeerkaraca.karga.user.domain.UsersRepository;
 import com.alpeerkaraca.karga.user.dto.UserProfileResponse;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class UserService {
     }
 
     public Users getUserByEmail(String email) {
-        return usersRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+        return usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Kullanıcı bulunamadı."));
     }
     public UserProfileResponse updateUser(Users users) {
         usersRepository.save(users);

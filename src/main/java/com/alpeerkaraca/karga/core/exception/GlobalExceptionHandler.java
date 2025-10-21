@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
         log.error("Genel Hata Yakalandı {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(ex.getMessage()));
+                .body(ApiResponse.error("Sunucuda beklenmedik bir hata oluştu. Lütfen daha sonra tekrar deneyin."));
     }
 
 }

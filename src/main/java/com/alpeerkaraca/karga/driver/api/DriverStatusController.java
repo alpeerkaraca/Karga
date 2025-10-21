@@ -3,6 +3,7 @@ package com.alpeerkaraca.karga.driver.api;
 import com.alpeerkaraca.karga.core.dto.ApiResponse;
 import com.alpeerkaraca.karga.driver.application.DriverStatusService;
 import com.alpeerkaraca.karga.driver.dto.DriverUpdateStatus;
+import com.alpeerkaraca.karga.user.application.UserService;
 import com.alpeerkaraca.karga.user.domain.Users;
 import com.alpeerkaraca.karga.user.domain.UsersRepository;
 import jakarta.validation.Valid;
@@ -23,13 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("hasRole('DRIVER') or hasRole('ADMIN')")
 public class DriverStatusController {
     private  final DriverStatusService driverStatusService;
-    private final UsersRepository usersRepository;
+    private final UserService userService;
 
     @PostMapping("/status")
     public ApiResponse<Void> updateDriverStatus(@Valid @RequestBody DriverUpdateStatus request) {
-        try {
+
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Users currentUser = usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
+            Users currentUser = userService.getUserByEmail(email);
 
             driverStatusService.updateDriverStatus(
                     currentUser.getUserId(),
@@ -38,10 +39,5 @@ public class DriverStatusController {
                     request.latitude()
             );
             return ApiResponse.success(null, "Sürücü durumu başarıyla güncellendi.");
-        }
-        catch (Exception e) {
-            return ApiResponse.error("Sürücü durumu güncellenirken hata oluştu.");
-        }
-
     }
 }

@@ -20,15 +20,16 @@ import java.util.UUID;
 @RequestMapping("/api/v1/trips")
 public class TripNearbyDrivers {
 
-    private final TripRequestService tripRequestService;
+    private static final double DEFAULT_RADIUS_KM = 5.0;
 
+    private final TripRequestService tripRequestService;
 
     @GetMapping("/nearby-drivers")
     public ApiResponse<List<NearbyDriversResponse>> getNearbyDrivers(@Valid @RequestBody NearbyDriversRequest request) {
         List<NearbyDriversResponse> nearbyDrivers = tripRequestService.findNearbyDrivers(
                 request.latitude(),
                 request.longitude(),
-                5.0
+                DEFAULT_RADIUS_KM
         );
         return ApiResponse.success(
                 nearbyDrivers,

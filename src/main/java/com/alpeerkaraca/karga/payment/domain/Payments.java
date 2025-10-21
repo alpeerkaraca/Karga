@@ -1,9 +1,8 @@
 package com.alpeerkaraca.karga.payment.domain;
 
+import com.alpeerkaraca.karga.user.domain.Users;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -11,7 +10,9 @@ import java.util.UUID;
 
 @Setter
 @Getter
-@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 public class Payments {
     @Id
@@ -22,5 +23,7 @@ public class Payments {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
     private String transactionId;
-
+    private String paymentUrl;
+    private UUID tripId;
+    private UUID passengerId;
 }

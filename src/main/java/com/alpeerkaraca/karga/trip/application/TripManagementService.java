@@ -4,11 +4,9 @@ import com.alpeerkaraca.karga.core.exception.ConflictException;
 import com.alpeerkaraca.karga.core.exception.ResourceNotFoundException;
 import com.alpeerkaraca.karga.driver.application.DriverService;
 import com.alpeerkaraca.karga.driver.application.DriverStatusService;
-import com.alpeerkaraca.karga.driver.domain.Driver;
 import com.alpeerkaraca.karga.trip.domain.TripStatus;
 import com.alpeerkaraca.karga.trip.domain.Trips;
 import com.alpeerkaraca.karga.trip.domain.TripsRepository;
-import com.alpeerkaraca.karga.trip.dto.CurrentLocation;
 import com.alpeerkaraca.karga.trip.dto.TripMessage;
 import com.alpeerkaraca.karga.user.application.UserService;
 import com.alpeerkaraca.karga.user.domain.Users;
@@ -17,12 +15,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.awt.geom.Point2D;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,9 +34,14 @@ public class TripManagementService {
     private final String TOPIC_TRIP_EVENTS = "trip_events";
     private final UserService userService;
 
+    public Trips getTripById(UUID tripId) {
+        return tripsRepository.findById(tripId).orElseThrow(() -> new ResourceNotFoundException("Yolculuk bulunamadı"));
+    }
+
     public List<Trips> getAvailableTrips() {
         return tripsRepository.findAvailableTrips();
     }
+
     @Transactional
     public Trips acceptTrip(UUID tripId, UUID driverId) {
         Trips trip = tripsRepository.findByIdForUpdate(tripId)
@@ -58,7 +62,9 @@ public class TripManagementService {
                 "TRIP_ACCEPTED",
                 savedTrip.getTripId(),
                 savedTrip.getDriver().getUserId(),
-                Timestamp.valueOf(LocalDateTime.now())
+                Timestamp.valueOf(LocalDateTime.now()),
+                new BigDecimal(0),
+                savedTrip.getPassenger().getUserId()
         );
         kafkaTemplate.send(TOPIC_TRIP_EVENTS, kafkaMessage);
 
@@ -77,7 +83,9 @@ public class TripManagementService {
                     "TRIP_STARTED",
                     trip.getTripId(),
                     trip.getDriver().getUserId(),
-                    Timestamp.valueOf(LocalDateTime.now())
+                    Timestamp.valueOf(LocalDateTime.now()),
+                    new BigDecimal(0),
+                    trip.getPassenger().getUserId()
             );
             kafkaTemplate.send(TOPIC_TRIP_EVENTS, kafkaMessage);
         }
@@ -90,16 +98,27 @@ public class TripManagementService {
         } else {
             trip.setTripStatus(TripStatus.COMPLETED);
             trip.setEndedAt(Timestamp.from(Instant.now()));
+            trip.setFare(calculateFare(trip));
             tripsRepository.save(trip);
             TripMessage kafkaMessage = new TripMessage(
                     "TRIP_COMPLETED",
                     trip.getTripId(),
                     trip.getDriver().getUserId(),
-                    Timestamp.valueOf(LocalDateTime.now())
+                    Timestamp.valueOf(LocalDateTime.now()),
+                    trip.getFare(),
+                    trip.getPassenger().getUserId()
             );
             kafkaTemplate.send(TOPIC_TRIP_EVENTS, kafkaMessage);
         }
+    }
 
+    private BigDecimal calculateFare(Trips trip) {
+        BigDecimal fare = new BigDecimal(0);
+        if(trip.getTripStatus() == TripStatus.COMPLETED){
+            double distance = Point2D.distance(trip.getStartLongitude(), trip.getStartLatitude(), trip.getEndLongitude(), trip.getEndLatitude());
+            fare = BigDecimal.valueOf((distance <= 2 ? 175.0 : 54.50 + distance * 36.30) * 100);
+        }
+        return fare;
     }
 
     public void cancelTrip(UUID tripId) {
@@ -118,7 +137,9 @@ public class TripManagementService {
                     "TRIP_CANCELED",
                     trip.getTripId(),
                     trip.getDriver() != null ? trip.getDriver().getUserId() : null,
-                    Timestamp.valueOf(LocalDateTime.now())
+                    Timestamp.valueOf(LocalDateTime.now()),
+                    new BigDecimal(0),
+                    trip.getPassenger().getUserId()
             );
             kafkaTemplate.send(TOPIC_TRIP_EVENTS, kafkaMessage);
         }

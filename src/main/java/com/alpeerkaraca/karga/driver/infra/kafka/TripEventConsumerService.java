@@ -16,7 +16,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TripEventConsumerService {
     private final DriverStatusService driverStatusService;
-    private final ObjectMapper objectMapper;
     private static final String TOPIC_TRIP_EVENTS = "trip_events";
 
     @KafkaListener(topics = TOPIC_TRIP_EVENTS, groupId = "driver_status_group")

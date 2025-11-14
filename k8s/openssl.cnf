@@ -1,0 +1,18 @@
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+CN = karga-db-cluster-router.dev.svc
+
+[v3_req]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = karga-db-cluster-router
+DNS.2 = karga-db-cluster-router.dev
+DNS.3 = karga-db-cluster-router.dev.svc
+DNS.4 = karga-db-cluster-router.dev.svc.cluster.local
+DNS.5 = *.karga-db-cluster-instances.dev.svc.cluster.local
+DNS.6 = localhost

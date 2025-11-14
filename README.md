@@ -75,7 +75,7 @@ Tüm manifestler ve detaylı talimatlar `k8s/` klasöründedir.
 
 4.  **Altyapıyı Başlat:**
     * `kubectl apply -f karga-mysql-cluster.yaml -n dev` (MySQL'i başlatır)
-    * `kubectl apply -f karga-kafka-SSL-LI-v2.yaml -n dev` (Kafka'yı başlatır)
+    * `kubectl apply -f karga-kafka.yaml -n dev` (Kafka'yı başlatır)
     * `helm install karga-redis bitnami/redis -n dev` (Redis'i başlatır)
 
 5.  **"Karga" Docker İmajını Hazırla:**

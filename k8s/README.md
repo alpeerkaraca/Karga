@@ -39,7 +39,7 @@ Bu klasör, "Karga" uygulamasının tüm bağımlılıkları (MySQL, Redis, Kafk
 
 5.  **Bağımlılıkları Ayağa Kaldır:**
     * `kubectl apply -f karga-mysql-cluster.yaml -n dev` (MySQL'i başlatır)
-    * `kubectl apply -f karga-kafka-SSL-LI-v2.yaml -n dev` (Kafka'yı başlatır)
+    * `kubectl apply -f karga-kafka.yaml -n dev` (Kafka'yı başlatır)
     * `helm install karga-redis bitnami/redis -n dev` (Redis'i başlatır)
 
 6.  **"Karga" Uygulamasını Başlat:**

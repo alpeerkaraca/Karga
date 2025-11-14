@@ -31,4 +31,15 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Creds ###
 src/main/resources/application-dev.properties
+
+# SSL Certificates
+src/main/resources/kafka.client.truststore.jks
+*.key
+*.crt
+*.csr
+
+# Kubernetes Secrets
+./k8s/kafka-secret.yaml

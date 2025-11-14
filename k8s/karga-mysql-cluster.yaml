@@ -1,0 +1,14 @@
+apiVersion: mysql.oracle.com/v2
+kind: InnoDBCluster
+metadata:
+  name: karga-db-cluster
+  namespace: dev
+spec:
+  secretName: karga-db-root-secret
+  instances: 1
+  version: "8.0.28"
+
+  router:
+    instances: 1
+  tlsCASecretName: karga-db-cluster-ca
+  tlsSecretName: karga-db-cluster-tls

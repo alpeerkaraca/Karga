@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: karga-config
+  namespace: dev
+data:
+  # Spring Boot Settings
+  SERVER_PORT: "8080"
+  SPRING_PROFILES_ACTIVE: "dev"
+
+  # Database Settings
+  SPRING_DATASOURCE_URL: "jdbc:mysql://karga-db-cluster:6446/mysql?useSSL=true&verifyServerCertificate=false&serverTimezone=UTC"
+  SPRING_DATASOURCE_USERNAME: "root"
+
+  # JPA Settings
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "none"
+  SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.MySQLDialect"
+
+  # Cache & Redis Settings
+  SPRING_DATA_REDIS_HOST: "karga-redis-master"
+  SPRING_DATA_REDIS_PORT: "6379"
+  SPRING_DATA_REDIS_SSL_ENABLED: "false"
+
+  # Messaging Queue (Kafka) Settings
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: "karga-kafka:9092"
+  SPRING_KAFKA_CONSUMER_GROUP_ID: "ride-sharing-group"
+  SPRING_KAFKA_CONSUMER_AUTO_OFFSET_RESET: "earliest"
+
+  SPRING_KAFKA_PRODUCER_KEY_SERIALIZER: "org.apache.kafka.common.serialization.StringSerializer"
+  SPRING_KAFKA_CONSUMER_KEY_DESERIALIZER: "org.apache.kafka.common.serialization.StringDeserializer"
+  SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER: "org.springframework.kafka.support.serializer.JsonSerializer"
+  SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER: "org.springframework.kafka.support.serializer.JsonDeserializer"
+
+  # Kafka SSL Settings
+  SPRING_KAFKA_PROPERTIES_SECURITY_PROTOCOL: "SASL_SSL"
+  SPRING_KAFKA_PROPERTIES_SASL_MECHANISM: "PLAIN"
+  SPRING_KAFKA_PROPERTIES_SSL_TRUSTSTORE_LOCATION: "/app/kafka.client.truststore.jks"
+  SPRING_KAFKA_PROPERTIES_SSL_TRUSTSTORE_PASSWORD: "${SPRING_KAFKA_TRUSTSTORE_PASSWORD}"
+  SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${SPRING_KAFKA_USERNAME}\" password=\"${SPRING_KAFKA_PASSWORD}\";"
+
+
+  # Actuator Settings
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"

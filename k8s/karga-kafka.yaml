@@ -1,0 +1,736 @@
+---
+# Source: kafka/templates/controller-eligible/networkpolicy.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: karga-kafka-controller
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/part-of: kafka
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: karga-kafka
+      app.kubernetes.io/name: kafka
+      app.kubernetes.io/component: controller-eligible
+      app.kubernetes.io/part-of: kafka
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - {}
+  ingress:
+    # Allow client connections
+    - ports:
+        - port: 9093
+        - port: 9092
+        - port: 9094
+---
+# Source: kafka/templates/broker/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: karga-kafka-broker
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+    app.kubernetes.io/component: broker
+    app.kubernetes.io/part-of: kafka
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: karga-kafka
+      app.kubernetes.io/name: kafka
+      app.kubernetes.io/component: broker
+      app.kubernetes.io/part-of: kafka
+---
+# Source: kafka/templates/controller-eligible/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: karga-kafka-controller
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/part-of: kafka
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: karga-kafka
+      app.kubernetes.io/name: kafka
+      app.kubernetes.io/component: controller-eligible
+      app.kubernetes.io/part-of: kafka
+---
+# Source: kafka/templates/provisioning/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: karga-kafka-provisioning
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+automountServiceAccountToken: false
+---
+# Source: kafka/templates/rbac/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: karga-kafka
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+    app.kubernetes.io/component: kafka
+automountServiceAccountToken: false
+---
+# Source: kafka/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: karga-kafka-user-passwords
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+type: Opaque
+data:
+  client-passwords: "N01DcU1qbHJKTw=="
+  system-user-password: "N01DcU1qbHJKTw=="
+  inter-broker-password: "cElwM3d1aWl4SQ=="
+  controller-password: "TVVIMmY0MmFzag=="
+---
+# Source: kafka/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: karga-kafka-kraft
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+type: Opaque
+data:
+  cluster-id: "TjBEVEc3VUZkNll4TVdPZmJMTVpybw=="
+  controller-0-id: "b0NiQTkxZTN4b3VVNlY0ZlRIYTBrZw=="
+  controller-1-id: "RVV1RHg3ZkQ3VFRjR2xsY2c5UU9OUQ=="
+  controller-2-id: "TVBJQ3hzMzNHUnRORDdQcDhJU0NCQQ=="
+---
+# Source: kafka/templates/tls-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: karga-kafka-tls
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+    app.kubernetes.io/part-of: kafka
+type: kubernetes.io/tls
+data:
+  ca.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFVENDQWZtZ0F3SUJBZ0lRWUlWY2VxREJyL2JFWnBsYWsybSs2akFOQmdrcWhraUc5dzBCQVFzRkFEQVQKTVJFd0R3WURWUVFERXdocllXWnJZUzFqWVRBZUZ3MHlOVEV4TVRReE5ESTVNak5hRncweU5qRXhNVFF4TkRJNQpNak5hTUJNeEVUQVBCZ05WQkFNVENHdGhabXRoTFdOaE1JSUJJakFOQmdrcWhraUc5dzBCQVFFRkFBT0NBUThBCk1JSUJDZ0tDQVFFQXJnenZvUWJiNzhJRll4cEg5cXp6NzFQZ21VcWtWQ29lRTBkRGZJOHFWTlRrdTlMYzhuVWUKdWJXZWF6UVBWbmxRbkZvekNZNWtYRy9SbW5KQWNFMjdHQzlnVmFlVzRPV2hMVjhLZEkzRDZsdHBpWUQ4ajBEaAptNGNQMGMyYllScGJ1Mk1NK1lMVzhORC82TFpKeHhtM2NBcE5vL0lJQjdRNW1UNEEzK3FFWS8rRHd0dmo4UjhPCjd0RHg1cGpTQTM3bXZXWjZCMkFMc1A2MUszL3JsdWVMa2NQUWhZeXFzYVp2VGtRTXRUUzBpdk95WHNNTTluUU4KSUNJMThHQW1zNTRJWjAwa1ZuODlnaHcrOVpBU3UwT3VoZEVPeXY4R0pUWUxHbjRQMi9mUEpsV1pHNjFsRHM4NQp0b2VkNmVieXF5N2ZwcFV0MDRQUDE4MW5JOW1kQU1tNE5RSURBUUFCbzJFd1h6QU9CZ05WSFE4QkFmOEVCQU1DCkFxUXdIUVlEVlIwbEJCWXdGQVlJS3dZQkJRVUhBd0VHQ0NzR0FRVUZCd01DTUE4R0ExVWRFd0VCL3dRRk1BTUIKQWY4d0hRWURWUjBPQkJZRUZHL0VpRkpkS3NWTlFKNjVLZTlXZzM0NzRLSUtNQTBHQ1NxR1NJYjNEUUVCQ3dVQQpBNElCQVFCakJPNzg2eWpadFpjRjl0TGxLN1BJOGNnbFlpWElPNVNNSjJORkZpQjUrdmdzeXkyUStCeExkenowCnM1MUlKUkV0eTN2RWZkWW14TE9uYVEzTElaQkdHMENybnVSajZKMHUyeHIrY0hjZUh1ZUNvbUo3MlA1NU1naHgKbTlJeStZK0xoZUZsR3J6d0pIR1hVTDNRcFRCSk91Z0FzL2lKZ3hkN1dHNU90aFUwQkpaVk9la09YQXpDL0JCbwo5d21oT29qdkRZR1FaYjNoaHZ2OVE3R0RidlE5UkVZWk5PejAwR2VhZ2tieGZBMU5jZkFqVGxrYVlORklEbTM2CnBZZytlS0lpaWpLYUh3cGpBaVArOHJMRzlJc09YQk5KcUptVEdiWFpJRTNQZUxTbjh3TVZuait4L1MwUmdiUloKYVlMdW9oL2Q2aXRuTWZpYmhIZTlEczkwSFhRUQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVlVENDQTJHZ0F3SUJBZ0lRRlZ2TkJuMEJMSUltZUIvZjBvYVJOVEFOQmdrcWhraUc5dzBCQVFzRkFEQVQKTVJFd0R3WURWUVFERXdocllXWnJZUzFqWVRBZUZ3MHlOVEV4TVRReE5ESTVNak5hRncweU5qRXhNVFF4TkRJNQpNak5hTUJZeEZEQVNCZ05WQkFNVEMydGhjbWRoTFd0aFptdGhNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DCkFROEFNSUlCQ2dLQ0FRRUF6QzVueFhaMURLYnFZQ213ZVNsdmJuMEVJZDUxQTVxQys0NE9rZjNMb0J5aGpuNGgKSjJiWlM3aFMvMFhXL29tSm92YXdJNmkwK1FZeWU3Qi8vVUZWTGFqaVYxTkJaeVZWdVhQbnd2YkVSODliRVduVApUcU9NYlJjbXd3R210dURPR1YrTHFLUjlWOHhjWWNTNTlRWEdWcDYzcFZKanRiU3hyYitnREVUQmk0ZkVVckZPCmxCNm9XTFhjOEJNckEzTmQrVk1ZcFdKT05WazFuWEVkRG9HK0wzc0pZV1hkTElRc01yRzZReEwzemJ2ZmNDQ2cKNHJNbjdodjhibEZraW1GL0xEVFcyVURWcm9UWlBydFBoWWZqWi9XYm1EZE1BdFhWNTZLWmJVQkJCYWRsQXZNQgp4eElQSHlrRVJxN2p5Ni8yM0RBd3B6T2FaU2c1L0N4NW5HeDdrUUlEQVFBQm80SUJ4RENDQWNBd0RnWURWUjBQCkFRSC9CQVFEQWdXZ01CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0RBakFNQmdOVkhSTUIKQWY4RUFqQUFNQjhHQTFVZEl3UVlNQmFBRkcvRWlGSmRLc1ZOUUo2NUtlOVdnMzQ3NEtJS01JSUJYZ1lEVlIwUgpCSUlCVlRDQ0FWR0NJV3RoY21kaExXdGhabXRoTG1SbGRpNXpkbU11WTJ4MWMzUmxjaTVzYjJOaGJJSVBhMkZ5CloyRXRhMkZtYTJFdVpHVjJnZ3RyWVhKbllTMXJZV1pyWVlJSk1USTNMakF1TUM0eGdnbHNiMk5oYkdodmMzU0MKTnlvdWEyRnlaMkV0YTJGbWEyRXRZMjl1ZEhKdmJHeGxjaTFvWldGa2JHVnpjeTVrWlhZdWMzWmpMbU5zZFhOMApaWEl1Ykc5allXeUNKU291YTJGeVoyRXRhMkZtYTJFdFkyOXVkSEp2Ykd4bGNpMW9aV0ZrYkdWemN5NWtaWGFDCklTb3VhMkZ5WjJFdGEyRm1hMkV0WTI5dWRISnZiR3hsY2kxb1pXRmtiR1Z6YzRJektpNXJZWEpuWVMxcllXWnIKWVMxaWNtOXJaWEl0YUdWaFpHeGxjM011WkdWMkxuTjJZeTVqYkhWemRHVnlMbXh2WTJGc2dpRXFMbXRoY21kaApMV3RoWm10aExXSnliMnRsY2kxb1pXRmtiR1Z6Y3k1a1pYYUNIU291YTJGeVoyRXRhMkZtYTJFdFluSnZhMlZ5CkxXaGxZV1JzWlhOek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQVJLRHZrbXcwNW0wck5qZnRrK00rTEhyWHoKQzhKV0FZOFZNWFpkQi9mbnZSSVgxK3ZkL2pCSTB6N0xRbkxIM0xZVks4Rm4wT0RUZ1NMNVAyc2xWMTZ5ZytneApXM3VWcktZMUpBdFdLVktnVjBaa0hFYVYwRGF4a1pEZHFVNDhIMS9DKzJFMTcyRFRLWW05dVZrS3R6aDFNYkcyCjl1TEhBcm44U050OTFDVWw2NmpuMU9LM1NSZzFjMldZRTdVZDVPa0JRTHdOdm1PbTBjVU1GR0ZDZWRKNm9rR2gKNFpTckNHR1JYUTI2NHNRUzNvbXoxTElyaEZ2TTd4dUMzalZZUHpmSGxMbUlMbkY5VGJjajNtQWpZY0J1eHBPNgpDK1c1RkxjOWJoU3Y0VXUzU2ZTdFNwOHFhY2ZrNnVNMG5IMTZrV3lWQ08yM3FpNUwvcmNONEhIYzlySFkKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBekM1bnhYWjFES2JxWUNtd2VTbHZibjBFSWQ1MUE1cUMrNDRPa2YzTG9CeWhqbjRoCkoyYlpTN2hTLzBYVy9vbUpvdmF3STZpMCtRWXllN0IvL1VGVkxhamlWMU5CWnlWVnVYUG53dmJFUjg5YkVXblQKVHFPTWJSY213d0dtdHVET0dWK0xxS1I5Vjh4Y1ljUzU5UVhHVnA2M3BWSmp0YlN4cmIrZ0RFVEJpNGZFVXJGTwpsQjZvV0xYYzhCTXJBM05kK1ZNWXBXSk9OVmsxblhFZERvRytMM3NKWVdYZExJUXNNckc2UXhMM3pidmZjQ0NnCjRyTW43aHY4YmxGa2ltRi9MRFRXMlVEVnJvVFpQcnRQaFlmalovV2JtRGRNQXRYVjU2S1piVUJCQmFkbEF2TUIKeHhJUEh5a0VScTdqeTYvMjNEQXdwek9hWlNnNS9DeDVuR3g3a1FJREFRQUJBb0lCQUJMeWdkNjE1Mk9OTE8rQwp1NndDcmUrM3B2OVF6VzQyazVxdC8wS0p2MzA2a1ZhY2pjQ29yM0Z5bEpxNGhUWWpQVDJ3a0VzTG9aa3o0Z1VCCitsNlJPWDVMTmNLYktOVDM3U3IyNU9sS3Mxd3dMUUdvcTQ1bGFJRDllY3oxT0t0SmJnbnBpTEVJMHA5QmlURWMKbnNVR0RDbTZaek9JT2J1MGhCdXA1OVVJYkZwSHpHbWw1endqeEc4TEQ2QzRLQ2w2RXc0eVRJUDgxQVBRVk9RRwoxU2ZkaVpWQ2tMTklJT0RkcUpFSzdOOUZIQ2xFdjB5RW51QlJrUHI2WHN3d1dFR3pOK2p5Qjk3R2p5YkxjOWNnCmRMaENOZDJVempDM3RZaU51REt5Vm5zd2o4TGttZm5yWE1BME9oa0l0QzMrVDE1Y21IR0dGT3RDL2RFSHUxZnoKclhMemRhRUNnWUVBMENsS3JsVDhQRWtXeFY1T3lIbzBQcXFPQ2plelpFVlFlc2VxZ2hPVWVlTUtvWmhHTGlXZQpBRDJBalJzNzdjb1YrMVltNzRZY3N4NWJKd29mM1ZNeHNPTnUzZWUvbkROTkNVR3llWlZzOWpZQm1BdEY0SkdECkcwSGxvY3RHOGFjVGtEQTI4QThlR2t5T0F0MllxTEZxeXNUVTYvSWx2R2lBUXc2MmpVWklHRDhDZ1lFQSt4cjEKSzVPWnZsQUhyU0dBcVEwR2JKMXBldDRyY2ZXQ00ybFJzOEN3bHhic051bU5Ta3U1eTI1NmVYQmNVUUMydEc1bgpJU2h3ak84UW93R2d6blF4NUt2bU12YzZkWGVzYTVnN1VrMzRRS2JDOVdCZ3diVTEzeEVPUndJdzRvVWUxeHVuCkhKMHNieHkxUVQ4WEEvS2l4Y3dlMmw4TkZMVmVHVW90S0wyTitDOENnWUFMSWZvMWdxUU8wVlhmYm1ER1JncmYKUXgzZm5BVURHdFhvQ3grcVgwTzBsUmp2ZFlaalYyMncwNWs1Y3Joc3lqOE10eG5UKzVjeldTOUUwanpNQ0hRQwo0dGIrRlRQaE5ia3NBcEI2QWl6V3FpTEJyL0NueHdCOUI3UXhSLzdlVTdJdkp2VDVOOFhEWUU3RUJuZndwYlJ4CmJiOTVjdlRqczY4UVp3d0tXRFRvM3dLQmdRQ0VUVVhUK2ViTmNSazZUU2FlNjIveEZsY1hGNnZJVlZTT2hmVTQKUWxSSXB4azZMWC8ySDBQN1BYQm1QNTlFUnAzOUh4WlRVQjFOQkVDOXdnUGFBenF1Z3l1OHVxb2diamQ0VVRNZwpRRmlHcDlhY3RuVUVXdGZSZWdrTnZNZkk4ZDYzODZmdTJaa3B5ZlJ1TmpHSU1QVTJSa0FUU25WMzdiOXdqN2FQCmVxQXNuUUtCZ0d3NkRPb01DUzNLNHUxcUhrKzVTNWlRVUdVZU5XZDl5d3MxZ29nMnpVQ3d4VndQa1lBL0N6TW8KWE5jSzlnb2F0eERWVEUyc2NKUk5renJvYlJMSTJ1ZGdwaEk2RG1FN1VkZytvNU1UVXZvdkF1bGU0dXhZTTFpdAovanFHcnFYZkE3THN3ZTArTUppUU1xVXhNNlA2TjZGU3pFc01vMTRYbFd6eFQzbkNRMk1KCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+---
+# Source: kafka/templates/tls-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: karga-kafka-tls-passwords
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+    app.kubernetes.io/part-of: kafka
+type: Opaque
+data:
+  keystore-password: "eUhXN0xwUXp2Zw=="
+  truststore-password: "VEtKYzZnbnpOdQ=="
+---
+# Source: kafka/templates/controller-eligible/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: karga-kafka-controller-configuration
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/part-of: kafka
+data:
+  server.properties: |-
+    advertised.listeners=CLIENT://advertised-address-placeholder:9092,INTERNAL://advertised-address-placeholder:9094
+    controller.listener.names=CONTROLLER
+    controller.quorum.bootstrap.servers=karga-kafka-controller-0.karga-kafka-controller-headless.dev.svc.cluster.local:9093,karga-kafka-controller-1.karga-kafka-controller-headless.dev.svc.cluster.local:9093,karga-kafka-controller-2.karga-kafka-controller-headless.dev.svc.cluster.local:9093
+    inter.broker.listener.name=INTERNAL
+    listener.name.client.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required user_user1="password-placeholder-0";
+    listener.name.client.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required;
+    listener.name.client.scram-sha-512.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required;
+    listener.name.controller.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="controller_user" password="controller-password-placeholder" user_controller_user="controller-password-placeholder" user_user1="password-placeholder-0";
+    listener.name.controller.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="controller_user" password="controller-password-placeholder";
+    listener.name.controller.scram-sha-512.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="controller_user" password="controller-password-placeholder";
+    listener.name.internal.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="inter_broker_user" password="interbroker-password-placeholder" user_inter_broker_user="interbroker-password-placeholder" user_user1="password-placeholder-0";
+    listener.name.internal.scram-sha-256.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="inter_broker_user" password="interbroker-password-placeholder";
+    listener.name.internal.scram-sha-512.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="inter_broker_user" password="interbroker-password-placeholder";
+    listener.security.protocol.map=CONTROLLER:SASL_SSL,CLIENT:SASL_SSL,INTERNAL:SASL_PLAINTEXT
+    listeners=CLIENT://:9092,INTERNAL://:9094,CONTROLLER://:9093
+    log.dir=/bitnami/kafka/data
+    logs.dir=/opt/bitnami/kafka/logs
+    process.roles=controller,broker
+    sasl.enabled.mechanisms=PLAIN,SCRAM-SHA-256,SCRAM-SHA-512
+    sasl.mechanism.controller.protocol=PLAIN
+    sasl.mechanism.inter.broker.protocol=PLAIN
+    ssl.client.auth=required
+    ssl.endpoint.identification.algorithm=https
+    ssl.keystore.location=/opt/bitnami/kafka/config/certs/kafka.keystore.jks
+    ssl.keystore.type=JKS
+    ssl.truststore.location=/opt/bitnami/kafka/config/certs/kafka.truststore.jks
+    ssl.truststore.type=JKS
+---
+# Source: kafka/templates/controller-eligible/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: karga-kafka-controller-headless
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/part-of: kafka
+spec:
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: tcp-interbroker
+      port: 9094
+      protocol: TCP
+      targetPort: interbroker
+    - name: tcp-client
+      port: 9092
+      protocol: TCP
+      targetPort: client
+    - name: tcp-controller
+      protocol: TCP
+      port: 9093
+      targetPort: controller
+  selector:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/part-of: kafka
+---
+# Source: kafka/templates/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: karga-kafka
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+    app.kubernetes.io/component: kafka
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: tcp-client
+      port: 9092
+      protocol: TCP
+      targetPort: client
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: kafka
+---
+# Source: kafka/templates/controller-eligible/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: karga-kafka-controller
+  namespace: "dev"
+  labels:
+    app.kubernetes.io/instance: karga-kafka
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/version: 4.0.0
+    helm.sh/chart: kafka-32.4.3
+    app.kubernetes.io/component: controller-eligible
+    app.kubernetes.io/part-of: kafka
+spec:
+  podManagementPolicy: Parallel
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: karga-kafka
+      app.kubernetes.io/name: kafka
+      app.kubernetes.io/component: controller-eligible
+      app.kubernetes.io/part-of: kafka
+  serviceName: karga-kafka-controller-headless
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: karga-kafka
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kafka
+        app.kubernetes.io/version: 4.0.0
+        helm.sh/chart: kafka-32.4.3
+        app.kubernetes.io/component: controller-eligible
+        app.kubernetes.io/part-of: kafka
+      annotations:
+        checksum/configuration: e0f64d5a18f1ded24e05dc6a3e27414f6ad51b96326f991229567c0eb3f6f8d5
+        checksum/secret: 15af0ad087916a7600006f46a4406bae99a4c398e62aec49c547b534b8c79ae8
+        checksum/tls-secret: 3d13918b1bfcd27e7379fc670196539c5e7c48565a55ac3e9a7138db8a73724f
+    spec:
+      
+      automountServiceAccountToken: false
+      hostNetwork: false
+      hostIPC: false
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: karga-kafka
+                    app.kubernetes.io/name: kafka
+                    app.kubernetes.io/component: controller-eligible
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        seccompProfile:
+          type: RuntimeDefault
+        supplementalGroups: []
+        sysctls: []
+      serviceAccountName: karga-kafka
+      enableServiceLinks: true
+      initContainers:
+        
+        - name: prepare-config
+          image: docker.io/bitnamilegacy/kafka:4.0.0-debian-12-r10
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add: []
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              cpu: 150m
+              ephemeral-storage: 2Gi
+              memory: 192Mi
+            requests:
+              cpu: 100m
+              ephemeral-storage: 50Mi
+              memory: 128Mi
+          command:
+            - /bin/bash
+          args:
+            - -ec
+            - |
+              . /opt/bitnami/scripts/libkafka.sh
+              configure_kafka_tls() {
+                  # Remove previously existing keystores and certificates, if any
+                  rm -f /certs/kafka.keystore.jks /certs/kafka.truststore.jks
+                  rm -f /certs/tls.crt /certs/tls.key /certs/ca.crt
+                  find /certs -name "xx*" -exec rm {} \;
+                  if [[ "${KAFKA_TLS_TYPE}" = "PEM" ]]; then
+                      # Copy PEM certificate and key
+                      if [[ -f "/mounted-certs/kafka-${POD_ROLE}-${POD_ID}.crt" && "/mounted-certs/kafka-${POD_ROLE}-${POD_ID}.key" ]]; then
+                          cp "/mounted-certs/kafka-${POD_ROLE}-${POD_ID}.crt" /certs/tls.crt
+                          # Copy the PEM key ensuring the key used PEM format with PKCS#8
+                          openssl pkcs8 -topk8 -nocrypt -passin pass:"${KAFKA_TLS_PEM_KEY_PASSWORD:-}" -in "/mounted-certs/kafka-${POD_ROLE}-${POD_ID}.key" > /certs/tls.key
+                      elif [[ -f /mounted-certs/tls.crt && -f /mounted-certs/tls.key ]]; then
+                          cp "/mounted-certs/tls.crt" /certs/tls.crt
+                          # Copy the PEM key ensuring the key used PEM format with PKCS#8
+                          openssl pkcs8 -topk8 -passin pass:"${KAFKA_TLS_PEM_KEY_PASSWORD:-}" -nocrypt -in "/mounted-certs/tls.key" > /certs/tls.key
+                      else
+                          error "PEM key and cert files not found"
+                      fi
+                      # Copy CA certificate
+                      if [[ -f /mounted-certs/ca.crt ]]; then
+                          cp /mounted-certs/ca.crt /certs/ca.crt
+                      else
+                          error "CA certificate file not found"
+                      fi
+                      # Create JKS keystore from PEM cert and key
+                      openssl pkcs12 -export -in "/certs/tls.crt" \
+                          -passout pass:"$KAFKA_TLS_KEYSTORE_PASSWORD" \
+                          -inkey "/certs/tls.key" \
+                          -out "/certs/kafka.keystore.p12"
+                      keytool -importkeystore -srckeystore "/certs/kafka.keystore.p12" \
+                          -srcstoretype PKCS12 \
+                          -srcstorepass "$KAFKA_TLS_KEYSTORE_PASSWORD" \
+                          -deststorepass "$KAFKA_TLS_KEYSTORE_PASSWORD" \
+                          -destkeystore "/certs/kafka.keystore.jks" \
+                          -noprompt
+                      # Create JKS truststore from CA cert
+                      keytool -keystore /certs/kafka.truststore.jks -alias CARoot -import -file /certs/ca.crt -storepass "$KAFKA_TLS_TRUSTSTORE_PASSWORD" -noprompt
+                      # Remove extra files
+                      rm -f "/certs/kafka.keystore.p12" "/certs/tls.crt" "/certs/tls.key" "/certs/ca.crt"
+                  elif [[ "$KAFKA_TLS_TYPE" = "JKS" ]]; then
+                      if [[ -f "/mounted-certs/kafka-${POD_ROLE}-${POD_ID}.keystore.jks" ]]; then
+                          cp "/mounted-certs/kafka-${POD_ROLE}-${POD_ID}.keystore.jks" /certs/kafka.keystore.jks
+                      elif [[ -f "$KAFKA_TLS_KEYSTORE_FILE" ]]; then
+                          cp "$KAFKA_TLS_KEYSTORE_FILE" /certs/kafka.keystore.jks
+                      else
+                          error "Keystore file not found"
+                      fi
+                      if [[ -f "$KAFKA_TLS_TRUSTSTORE_FILE" ]]; then
+                          cp "$KAFKA_TLS_TRUSTSTORE_FILE" /certs/kafka.truststore.jks
+                      else
+                          error "Truststore file not found"
+                      fi
+                  else
+                      error "Invalid type $KAFKA_TLS_TYPE"
+                  fi
+                  # Configure TLS password settings in Kafka configuration
+                  [[ -n "${KAFKA_TLS_KEYSTORE_PASSWORD:-}" ]] && kafka_server_conf_set "ssl.keystore.password" "$KAFKA_TLS_KEYSTORE_PASSWORD"
+                  [[ -n "${KAFKA_TLS_TRUSTSTORE_PASSWORD:-}" ]] && kafka_server_conf_set "ssl.truststore.password" "$KAFKA_TLS_TRUSTSTORE_PASSWORD"
+                  [[ -n "${KAFKA_TLS_PEM_KEY_PASSWORD:-}" ]] && kafka_server_conf_set "ssl.key.password" "$KAFKA_TLS_PEM_KEY_PASSWORD"
+                  # Avoid errors caused by previous checks
+                  true
+              }
+              configure_kafka_sasl() {
+                  # Replace placeholders with passwords
+                  replace_in_file "$KAFKA_CONF_FILE" "interbroker-password-placeholder" "$KAFKA_INTER_BROKER_PASSWORD"
+                  replace_in_file "$KAFKA_CONF_FILE" "controller-password-placeholder" "$KAFKA_CONTROLLER_PASSWORD"
+                  read -r -a passwords <<< "$(tr ',;' ' ' <<<"${KAFKA_CLIENT_PASSWORDS:-}")"
+                  for ((i = 0; i < ${#passwords[@]}; i++)); do
+                      replace_in_file "$KAFKA_CONF_FILE" "password-placeholder-${i}\"" "${passwords[i]}\""
+                  done
+              }
+        
+              cp /configmaps/server.properties $KAFKA_CONF_FILE
+        
+              # Get pod ID and role, last and second last fields in the pod name respectively
+              POD_ID="${MY_POD_NAME##*-}"
+              POD_ROLE="${MY_POD_NAME%-*}"; POD_ROLE="${POD_ROLE##*-}"
+        
+              # Configure node.id
+              ID=$((POD_ID + KAFKA_MIN_ID))
+              [[ -f "/bitnami/kafka/data/meta.properties" ]] && ID="$(grep "node.id" /bitnami/kafka/data/meta.properties | awk -F '=' '{print $2}')"
+              kafka_server_conf_set "node.id" "$ID"
+              # Configure initial controllers
+              if [[ "controller" =~ "$POD_ROLE" ]]; then
+                  INITIAL_CONTROLLERS=()
+                  for ((i = 0; i < 3; i++)); do
+                      var="KAFKA_CONTROLLER_${i}_DIR_ID"; DIR_ID="${!var}"
+                      [[ $i -eq $POD_ID ]] && [[ -f "/bitnami/kafka/data/meta.properties" ]] && DIR_ID="$(grep "directory.id" /bitnami/kafka/data/meta.properties | awk -F '=' '{print $2}')"
+                      INITIAL_CONTROLLERS+=("${i}@${KAFKA_FULLNAME}-${POD_ROLE}-${i}.${KAFKA_CONTROLLER_SVC_NAME}.${MY_POD_NAMESPACE}.svc.${CLUSTER_DOMAIN}:${KAFKA_CONTROLLER_PORT}:${DIR_ID}")
+                  done
+                  echo "${INITIAL_CONTROLLERS[*]}" | awk -v OFS=',' '{$1=$1}1' > /shared/initial-controllers.txt
+              fi
+              replace_in_file "$KAFKA_CONF_FILE" "advertised-address-placeholder" "${MY_POD_NAME}.${KAFKA_FULLNAME}-${POD_ROLE}-headless.${MY_POD_NAMESPACE}.svc.${CLUSTER_DOMAIN}"
+              configure_kafka_tls
+              sasl_env_vars=(
+                KAFKA_CLIENT_PASSWORDS
+                KAFKA_INTER_BROKER_PASSWORD
+                KAFKA_INTER_BROKER_CLIENT_SECRET
+                KAFKA_CONTROLLER_PASSWORD
+                KAFKA_CONTROLLER_CLIENT_SECRET
+              )
+              for env_var in "${sasl_env_vars[@]}"; do
+                  file_env_var="${env_var}_FILE"
+                  if [[ -n "${!file_env_var:-}" ]]; then
+                      if [[ -r "${!file_env_var:-}" ]]; then
+                          export "${env_var}=$(< "${!file_env_var}")"
+                          unset "${file_env_var}"
+                      else
+                          warn "Skipping export of '${env_var}'. '${!file_env_var:-}' is not readable."
+                      fi
+                  fi
+              done
+              configure_kafka_sasl
+              if [[ -f /secret-config/server-secret.properties ]]; then
+                  cat /secret-config/server-secret.properties >> $KAFKA_CONF_FILE
+              fi
+              
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                    fieldPath: metadata.name
+            - name: MY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: KAFKA_FULLNAME
+              value: "karga-kafka"
+            - name: CLUSTER_DOMAIN
+              value: "cluster.local"
+            - name: KAFKA_VOLUME_DIR
+              value: "/bitnami/kafka"
+            - name: KAFKA_CONF_FILE
+              value: /config/server.properties
+            - name: KAFKA_MIN_ID
+              value: "0"
+            - name: KAFKA_CONTROLLER_SVC_NAME
+              value: karga-kafka-controller-headless
+            - name: KAFKA_CONTROLLER_PORT
+              value: "9093"
+            - name: KAFKA_CONTROLLER_0_DIR_ID
+              valueFrom:
+                secretKeyRef:
+                  name: karga-kafka-kraft
+                  key: controller-0-id
+            - name: KAFKA_CONTROLLER_1_DIR_ID
+              valueFrom:
+                secretKeyRef:
+                  name: karga-kafka-kraft
+                  key: controller-1-id
+            - name: KAFKA_CONTROLLER_2_DIR_ID
+              valueFrom:
+                secretKeyRef:
+                  name: karga-kafka-kraft
+                  key: controller-2-id
+            
+            - name: KAFKA_CLIENT_USERS
+              value: "user1"
+            - name: KAFKA_CLIENT_PASSWORDS_FILE
+              value: /opt/bitnami/kafka/config/secrets/client-passwords
+            - name: KAFKA_INTER_BROKER_USER
+              value: "inter_broker_user"
+            - name: KAFKA_INTER_BROKER_PASSWORD_FILE
+              value: /opt/bitnami/kafka/config/secrets/inter-broker-password
+            - name: KAFKA_CONTROLLER_USER
+              value: "controller_user"
+            - name: KAFKA_CONTROLLER_PASSWORD_FILE
+              value: /opt/bitnami/kafka/config/secrets/controller-password
+            - name: KAFKA_TLS_TYPE
+              value: PEM
+            - name: KAFKA_TLS_KEYSTORE_FILE
+              value: "/mounted-certs/kafka.keystore.jks"
+            - name: KAFKA_TLS_TRUSTSTORE_FILE
+              value: "/mounted-certs/kafka.truststore.jks"
+            - name: KAFKA_TLS_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: karga-kafka-tls-passwords
+                  key: "keystore-password"
+            - name: KAFKA_TLS_TRUSTSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: karga-kafka-tls-passwords
+                  key: "truststore-password"
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/kafka
+            - name: kafka-config
+              mountPath: /config
+            - name: kafka-configmaps
+              mountPath: /configmaps
+            - name: kafka-secret-config
+              mountPath: /secret-config
+            - name: tmp
+              mountPath: /tmp
+            - name: init-shared
+              mountPath: /shared
+            - name: kafka-shared-certs
+              mountPath: /certs
+            - name: kafka-certs
+              mountPath: /mounted-certs
+              readOnly: true
+            - name: kafka-sasl
+              mountPath: /opt/bitnami/kafka/config/secrets
+              readOnly: true
+      containers:
+        - name: kafka
+          image: docker.io/bitnamilegacy/kafka:4.0.0-debian-12-r10
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+          env:
+            - name: KAFKA_HEAP_OPTS
+              value: "-XX:InitialRAMPercentage=75 -XX:MaxRAMPercentage=75"
+            - name: KAFKA_CFG_PROCESS_ROLES
+              value: "controller,broker"
+            - name: KAFKA_INITIAL_CONTROLLERS_FILE
+              value: /shared/initial-controllers.txt
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: KAFKA_KRAFT_CLUSTER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: karga-kafka-kraft
+                  key: cluster-id
+            - name: KAFKA_KRAFT_BOOTSTRAP_SCRAM_USERS
+              value: "true"
+            
+            - name: KAFKA_CLIENT_USERS
+              value: "user1"
+            - name: KAFKA_CLIENT_PASSWORDS_FILE
+              value: /opt/bitnami/kafka/config/secrets/client-passwords
+            - name: KAFKA_INTER_BROKER_USER
+              value: "inter_broker_user"
+            - name: KAFKA_INTER_BROKER_PASSWORD_FILE
+              value: /opt/bitnami/kafka/config/secrets/inter-broker-password
+            - name: KAFKA_CONTROLLER_USER
+              value: "controller_user"
+            - name: KAFKA_CONTROLLER_PASSWORD_FILE
+              value: /opt/bitnami/kafka/config/secrets/controller-password
+          ports:
+            - name: controller
+              containerPort: 9093
+            - name: client
+              containerPort: 9092
+            - name: interbroker
+              containerPort: 9094
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            exec:
+              command:
+                - pgrep
+                - -f
+                - kafka
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            tcpSocket:
+              port: "controller"
+          resources:
+            limits:
+              cpu: 750m
+              ephemeral-storage: 2Gi
+              memory: 768Mi
+            requests:
+              cpu: 500m
+              ephemeral-storage: 50Mi
+              memory: 512Mi
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/kafka
+            - name: logs
+              mountPath: /opt/bitnami/kafka/logs
+            - name: kafka-config
+              mountPath: /opt/bitnami/kafka/config/server.properties
+              subPath: server.properties
+            - name: tmp
+              mountPath: /tmp
+            - name: init-shared
+              mountPath: /shared
+            - name: kafka-shared-certs
+              mountPath: /opt/bitnami/kafka/config/certs
+              readOnly: true
+            - name: kafka-sasl
+              mountPath: /opt/bitnami/kafka/config/secrets
+              readOnly: true
+      volumes:
+        - name: kafka-configmaps
+          configMap:
+            name: karga-kafka-controller-configuration
+        - name: kafka-secret-config
+          emptyDir: {}
+        - name: kafka-config
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: init-shared
+          emptyDir: {}
+        - name: kafka-shared-certs
+          emptyDir: {}
+        - name: kafka-certs
+          projected:
+            defaultMode: 256
+            sources:
+              - secret:
+                  name: karga-kafka-tls
+        - name: kafka-sasl
+          projected:
+            sources:
+              - secret:
+                  name:  karga-kafka-user-passwords
+        - name: logs
+          emptyDir: {}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "8Gi"

@@ -4,6 +4,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.5-brightgreen.svg?logo=spring&style=for-the-badge)](https://spring.io/projects/spring-boot)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-darkblue.svg?logo=kubernetes&style=for-the-badge)](https://kubernetes.io)
 [![Kafka](https://img.shields.io/badge/Apache_Kafka-black.svg?logo=apachekafka&style=for-the-badge)](https://kafka.apache.org)
+[![Build Status](https://jenkins.alpeerkaraca.site/buildStatus/icon?job=karga-pipeline)](https://jenkins.alpeerkaraca.site/job/karga-pipeline/)
 
 "Karga", modern bir araç paylaşım (ride-sharing) uygulaması için geliştirilmiş, event-driven (olay güdümlü) bir backend sistemidir.
 
